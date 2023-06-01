@@ -44,6 +44,7 @@ export interface RedisVectorStoreConfig {
   metadataKey?: string;
   vectorKey?: string;
   filter?: RedisVectorStoreFilterType;
+  temporary?: number
 }
 
 export interface RedisAddOptions {
@@ -74,6 +75,8 @@ export class RedisVectorStore extends VectorStore {
 
   filter?: RedisVectorStoreFilterType;
 
+  temporary?: number
+
   constructor(embeddings: Embeddings, _dbConfig: RedisVectorStoreConfig) {
     super(embeddings, _dbConfig);
 
@@ -88,6 +91,7 @@ export class RedisVectorStore extends VectorStore {
     this.metadataKey = _dbConfig.metadataKey ?? "metadata";
     this.vectorKey = _dbConfig.vectorKey ?? "content_vector";
     this.filter = _dbConfig.filter;
+    this.temporary = _dbConfig.temporary;
   }
 
   async addDocuments(
@@ -231,6 +235,7 @@ export class RedisVectorStore extends VectorStore {
     await this.redisClient.ft.create(this.indexName, schema, {
       ON: "HASH",
       PREFIX: this.keyPrefix,
+      TEMPORARY: this.temporary
     });
   }
 
